@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Custom Theme Colors for CSS Reference --- */
+:root {
+  --color-deep-blue: #003366; /* Adjust to your exact tailwind hex */
+  --color-bright-green: #00CC99; /* Adjust to your exact tailwind hex */
+}
+
+/* =========================================
+   ADMIN DASHBOARD STYLES (ported from ANBuildWork)
+   ========================================= */
+@layer utilities {
+  .font-display {
+    font-family: 'Poppins', sans-serif;
+  }
+}
+
+@layer components {
+  .stat-card {
+    @apply bg-gray-50 rounded-card shadow-card p-5;
+  }
+}
+
+/* =========================================
+   PREMIUM SWIPER OVERRIDES
+   ========================================= */
+
+/* --- Swiper Navigation Arrows (Sharp & Architectural) --- */
+.swiper-button-next,
+.swiper-button-prev {
+    color: white !important;
+    background-color: var(--color-deep-blue) !important;
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 2px; /* Sharp corners instead of 50% circle */
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background-color: var(--color-bright-green) !important;
+    transform: scale(1.05);
+}
+
+/* Arrow icon size inside the buttons */
+.swiper-button-next:after,
+.swiper-button-prev:after {
+    font-size: 18px !important;
+    font-weight: 900 !important;
+}
+
+/* Hide arrows on very small mobile screens for cleaner look */
+@media (max-width: 640px) {
+    .swiper-button-next,
+    .swiper-button-prev {
+        display: none !important;
+    }
+}
+
+/* --- Swiper Pagination Bullets (Dash Style) --- */
+/* Replaces standard dots with modern, wide dashes for an industrial look */
+.swiper-pagination-bullet {
+    background: rgba(255, 255, 255, 0.4) !important;
+    width: 24px !important; 
+    height: 4px !important; /* Flat dash instead of circle */
+    border-radius: 0 !important; /* No rounded corners */
+    opacity: 1 !important;
+    transition: all 0.3s ease;
+    margin: 0 4px !important;
+}
+
+.swiper-pagination-bullet-active {
+    background: var(--color-bright-green) !important;
+    width: 32px !important; /* Active dash becomes slightly wider */
+}
