@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { BrowserRouter as Router, Route, Routes, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 import Navbar from './components/Navbar.jsx';
@@ -26,11 +26,31 @@ import HumanResourceManagement from './features/human-resource/HumanResourceMana
 import MaterialLog from './features/material-log/MaterialLog.jsx';
 import SiteEngineers from './features/site-engineers/SiteEngineers.jsx';
 import UsersLayout from './features/users/UsersLayout.jsx';
+import UserManagement from './features/users/UserManagement.jsx';
+import Logout from './features/auth/Logout.jsx';
 import RolesPermissions from './features/roles-permissions/RolesPermissions.jsx';
 import ActivityLog from './features/activity-log/ActivityLog.jsx';
 import NewsAlerts from './features/news-alerts/NewsAlerts.jsx';
 import ConstructionSites from './features/construction-sites/ConstructionSites.jsx';
 import SettingsPage from './features/settings/SettingsPage.jsx';
+
+// Scroll to the top whenever the public pages change route
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
+
+// Public website shell: Navbar + page + Footer. Dashboards do NOT use this.
+function PublicLayout({ user, onLogout }) {
+  return (
+    <div className="flex flex-col min-h-screen font-sans">
+      <Navbar user={user} onLogout={onLogout} />
+      <main className="flex-grow"><Outlet /></main>
+      <Footer />
+    </div>
+  );
+}
 
 function App() {
   const [user, setUser] = useState(null);
@@ -62,11 +82,11 @@ function App() {
     setUser(userData);
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     setUser(null);
-  };
+  }, []);
 
   if (loadingAuth) {
     return <div className="min-h-screen bg-light-bg"></div>; 
@@ -75,72 +95,57 @@ function App() {
   return (
     <Router>
       <Toaster position="top-center" reverseOrder={false} />
+      <ScrollToTop />
+      <Routes>
+        {/* Public website: header + footer */}
+        <Route element={<PublicLayout user={user} onLogout={handleLogout} />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/services" element={<ServicesPage />} />
+          <Route path="/projects" element={<ProjectsPage />} />
+          <Route path="/team" element={<TeamPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/OurMission" element={<OurMission />} />
+          <Route path="/packages" element={<OurPackages />} />
+          <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <LoginPage onLogin={handleLogin} />} />
+          <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <RegisterPage />} />
+        </Route>
 
-      <div className="flex flex-col min-h-screen font-sans">
-        <Navbar user={user} onLogout={handleLogout} /> 
-        
-        <main className="flex-grow">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/services" element={<ServicesPage />} />
-            <Route path="/projects" element={<ProjectsPage />} />
-            <Route path="/team" element={<TeamPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/OurMission" element={<OurMission />} />
-            <Route path="/packages" element={<OurPackages />} /> 
-            
-            {/* Auth Routes */}
-            <Route 
-              path="/login" 
-              element={user ? <Navigate to="/dashboard" /> : <LoginPage onLogin={handleLogin} />} 
-            />
-            <Route 
-              path="/register" 
-              element={user ? <Navigate to="/dashboard" /> : <RegisterPage />} 
-            />
+        {/* Client dashboard: own fixed header/footer, only content scrolls */}
+        <Route
+          path="/dashboard"
+          element={
+            user
+              ? (user.role === 'admin' ? <Navigate to="/admin" replace /> : <UserDashboard user={user} onLogout={handleLogout} />)
+              : <Navigate to="/login" replace />
+          }
+        />
 
-            <Route 
-              path="/dashboard" 
-              element={
-                user ? (
-                  user.role === 'admin' 
-                    ? <Navigate to="/admin" replace /> 
-                    : <UserDashboard user={user} onLogout={handleLogout} />
-                ) : (
-                  <Navigate to="/login" replace />
-                )
-              } 
-            />
+        <Route path="/logout" element={<Logout onLogout={handleLogout} />} />
 
-            {/* === NEW: Admin nested routes (replaces old single AdminDashboard route) === */}
-            <Route
-              path="/admin/*"
-              element={
-                user && user.role === 'admin'
-                  ? <AdminLayout user={user} onLogout={handleLogout} />
-                  : <Navigate to="/dashboard" replace />
-              }
-            >
-              <Route index element={<Dashboard />} />
-              <Route path="human-resource" element={<HumanResourceManagement />} />
-              <Route path="material-log" element={<MaterialLog />} />
-              <Route path="site-engineers" element={<SiteEngineers />} />
-              <Route path="users" element={<UsersLayout />} />
-              <Route path="roles-permissions" element={<RolesPermissions />} />
-              <Route path="activity-log" element={<ActivityLog />} />
-              <Route path="news-alerts" element={<NewsAlerts />} />
-              <Route path="construction-sites" element={<ConstructionSites />} />
-              <Route path="settings" element={<SettingsPage />} />
-            </Route>
+        {/* Admin dashboard: own fixed header/footer, only content scrolls */}
+        <Route
+          path="/admin/*"
+          element={user && user.role === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to={user ? '/dashboard' : '/login'} replace />}
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="human-resource" element={<HumanResourceManagement />} />
+          <Route path="material-log" element={<MaterialLog />} />
+          <Route path="site-engineers" element={<SiteEngineers />} />
+          <Route path="users" element={<UsersLayout />}>
+            <Route index element={<UserManagement />} />
+            <Route path="roles" element={<RolesPermissions />} />
+            <Route path="activity" element={<ActivityLog />} />
+          </Route>
+          <Route path="roles-permissions" element={<RolesPermissions />} />
+          <Route path="activity-log" element={<ActivityLog />} />
+          <Route path="news-alerts" element={<NewsAlerts />} />
+          <Route path="construction-sites" element={<ConstructionSites />} />
+          <Route path="settings" element={<SettingsPage />} />
+        </Route>
 
-            <Route path="*" element={<Navigate to="/" />} />
-          </Routes>
-        </main>
-        
-        <Footer /> 
-      </div>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </Router>
   );
 }

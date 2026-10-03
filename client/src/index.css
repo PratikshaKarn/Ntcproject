@@ -4,8 +4,8 @@
 
 /* --- Custom Theme Colors for CSS Reference --- */
 :root {
-  --color-deep-blue: #003366; /* Adjust to your exact tailwind hex */
-  --color-bright-green: #00CC99; /* Adjust to your exact tailwind hex */
+  --color-deep-blue: #083b75;
+  --color-bright-green: #e31e24;
 }
 
 /* =========================================
@@ -76,3 +76,10 @@
     background: var(--color-bright-green) !important;
     width: 32px !important; /* Active dash becomes slightly wider */
 }
+
+/* =========================================
+   APP SHELL (dashboards): only the content area scrolls
+   ========================================= */
+.hide-scrollbar { scrollbar-width: none; }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.scroll-area { scrollbar-width: thin; scrollbar-color: #9bbbe0 transparent; }

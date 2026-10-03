@@ -1,209 +1,149 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import logo from '/src/assets/images/image.png';
-import { FaBars, FaTimes, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
+import {
+  FaBars, FaTimes, FaUserCircle, FaSignOutAlt, FaPhoneAlt, FaEnvelope, FaChevronDown,
+} from 'react-icons/fa';
 
-/* ---------------- Magnetic CTA Button ---------------- */
-const MagneticButton = ({ children, to, onClick, className = '' }) => {
-  const ref = useRef(null);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
+const navItems = [
+  { to: '/', label: 'Home', end: true },
+  { to: '/about', label: 'About' },
+  { to: '/services', label: 'Services' },
+  { to: '/projects', label: 'Projects' },
+  { to: '/packages', label: 'Packages' },
+  { to: '/team', label: 'Team' },
+  { to: '/contact', label: 'Contact' },
+];
 
-  const handleMouseMove = (e) => {
-    const el = ref.current;
-    if (!el) return;
-    const rect = el.getBoundingClientRect();
-    const relX = e.clientX - rect.left - rect.width / 2;
-    const relY = e.clientY - rect.top - rect.height / 2;
-    setOffset({ x: relX * 0.35, y: relY * 0.45 });
-  };
-
-  const handleMouseLeave = () => setOffset({ x: 0, y: 0 });
-
-  const style = { transform: `translate(${offset.x}px, ${offset.y}px)` };
-
-  if (to) {
-    return (
-      <NavLink
-        ref={ref}
-        to={to}
-        onClick={onClick}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={style}
-        className={`transition-transform duration-150 ease-out will-change-transform ${className}`}
-      >
-        {children}
-      </NavLink>
-    );
-  }
-
-  return (
-    <button
-      ref={ref}
-      onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={style}
-      className={`transition-transform duration-150 ease-out will-change-transform ${className}`}
-    >
-      {children}
-    </button>
-  );
-};
-
+/**
+ * Public site header, modelled on ntc.net.np:
+ * a slim utility strip (contact, language, client care) above a white main bar.
+ * It is `sticky` (in normal flow), so it never overlaps the page content.
+ */
 const Navbar = ({ user, onLogout }) => {
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [lang, setLang] = useState('EN');
+  const close = () => setMobileOpen(false);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  const closeMobileMenu = () => setIsMobileMenuOpen(false);
-
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 40);
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const navLinkClasses =
-    'relative text-white/80 text-xs font-bold uppercase tracking-[0.15em] hover:text-white transition duration-300 py-2 border-b-2 border-transparent';
-  const activeNavLinkClasses =
-    'relative text-white text-xs font-bold uppercase tracking-[0.15em] py-2 border-b-2 border-cyan-glow drop-shadow-[0_0_6px_rgba(34,211,238,0.8)]';
-
-  const navItems = [
-    { to: '/', label: 'Home', end: true },
-    { to: '/about', label: 'About' },
-    { to: '/services', label: 'Services' },
-    { to: '/projects', label: 'Projects' },
-    { to: '/packages', label: 'Packages' },
-    { to: '/contact', label: 'Contact' },
-  ];
+  const linkCls = ({ isActive }) =>
+    `relative px-1 py-5 text-sm font-semibold transition-colors border-b-[3px] ${
+      isActive ? 'text-nt-blue border-nt-red' : 'text-ink-900 border-transparent hover:text-nt-blue'
+    }`;
 
   return (
-    <nav
-      className={`fixed top-0 left-0 w-full z-50 font-sans transition-all duration-500 ${
-        isScrolled
-          ? 'bg-charcoal/80 backdrop-blur-xl border-b border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.3)]'
-          : 'bg-transparent border-b border-transparent'
-      }`}
-    >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center max-w-7xl">
-
-        {/* Logo — crisp white + matte copper */}
-        <NavLink to="/" className="flex items-center gap-3 group shrink-0" onClick={closeMobileMenu}>
-          <img src={logo} alt="Construction Work Logo" className="h-11 w-auto transform group-hover:scale-105 transition-transform duration-300" />
-          <div className="flex flex-col leading-none">
-            <span className="text-lg font-extrabold text-white tracking-wide">
-              CONSTRUCTION WORK
-            </span>
-            <span className="text-[0.6rem] font-bold text-site-orange tracking-[0.25em] uppercase mt-1">
-              Pvt. Ltd.
-            </span>
+    <header className="sticky top-0 z-50 font-sans shadow-md">
+      {/* ---------- Utility strip ---------- */}
+      <div className="hidden lg:block bg-nt-dark text-white text-xs">
+        <div className="max-w-7xl mx-auto px-6 h-9 flex items-center justify-between">
+          <div className="flex items-center gap-6 text-white/80">
+            <a href="tel:+919142873421" className="flex items-center gap-2 hover:text-white"><FaPhoneAlt size={10} /> +91 91428 73421</a>
+            <a href="mailto:anbuildworks@gmail.com" className="flex items-center gap-2 hover:text-white"><FaEnvelope size={11} /> anbuildworks@gmail.com</a>
           </div>
-        </NavLink>
+          <div className="flex items-center gap-5">
+            <Link to="/packages" className="text-white/80 hover:text-white">Offers</Link>
+            <div className="flex items-center rounded-sm overflow-hidden border border-white/25">
+              {[['EN', 'English'], ['NE', 'नेपाली']].map(([code, text]) => (
+                <button
+                  key={code}
+                  onClick={() => setLang(code)}
+                  className={`px-3 py-1 ${lang === code ? 'bg-white text-nt-dark font-semibold' : 'text-white/80 hover:bg-white/10'}`}
+                >
+                  {text}
+                </button>
+              ))}
+            </div>
+            {/* Client Care dropdown (like NTC's "Self Care") */}
+            <div className="relative group">
+              <button className="flex items-center gap-2 bg-nt-red hover:bg-red-700 px-4 h-9 font-semibold transition-colors">
+                <FaUserCircle /> Client Care <FaChevronDown size={9} />
+              </button>
+              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition-all absolute right-0 top-full w-48 bg-white text-ink-900 shadow-xl border-t-2 border-nt-red">
+                {user ? (
+                  <>
+                    <Link to="/dashboard" className="block px-4 py-3 hover:bg-nt-sky">My dashboard</Link>
+                    <button onClick={onLogout} className="block w-full text-left px-4 py-3 hover:bg-nt-sky text-nt-red">Logout</button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="block px-4 py-3 hover:bg-nt-sky">Login</Link>
+                    <Link to="/register" className="block px-4 py-3 hover:bg-nt-sky">Register</Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-        {/* Mobile Toggle */}
-        <div className="lg:hidden">
+      {/* ---------- Main bar ---------- */}
+      <nav className="bg-white border-b border-nt-blue/10">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <NavLink to="/" onClick={close} className="flex items-center gap-3 shrink-0">
+            <img src={logo} alt="Construction Work logo" className="h-10 w-auto" />
+            <div className="leading-tight">
+              <span className="block text-base font-extrabold text-nt-blue tracking-wide">CONSTRUCTION WORK</span>
+              <span className="block text-[10px] font-semibold text-nt-red tracking-[0.2em]">PVT. LTD.</span>
+            </div>
+          </NavLink>
+
+          <ul className="hidden lg:flex items-center gap-7">
+            {navItems.map((item) => (
+              <li key={item.to}><NavLink to={item.to} end={item.end} className={linkCls}>{item.label}</NavLink></li>
+            ))}
+          </ul>
+
+          <div className="hidden lg:flex items-center gap-3">
+            {user ? (
+              <>
+                <Link to="/dashboard" className="px-5 py-2.5 bg-nt-blue hover:bg-nt-dark text-white text-sm font-semibold rounded-sm transition-colors">Dashboard</Link>
+                <button onClick={onLogout} className="flex items-center gap-2 px-4 py-2.5 border border-nt-red text-nt-red text-sm font-semibold rounded-sm hover:bg-nt-red hover:text-white transition-colors">
+                  Logout <FaSignOutAlt />
+                </button>
+              </>
+            ) : (
+              <Link to="/login" className="px-6 py-2.5 bg-nt-red hover:bg-red-700 text-white text-sm font-semibold rounded-sm transition-colors">Client Login</Link>
+            )}
+          </div>
+
           <button
-            onClick={toggleMobileMenu}
-            className="text-white text-2xl p-2 focus:outline-none hover:text-site-orange transition-colors"
+            onClick={() => setMobileOpen((v) => !v)}
+            className="lg:hidden text-nt-blue text-2xl p-2"
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
           >
-            {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+            {mobileOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
 
-        {/* --- DESKTOP CENTER NAV --- */}
-        <ul className="hidden lg:flex items-center gap-9 absolute left-1/2 -translate-x-1/2">
-          {navItems.map((item) => (
-            <li key={item.to}>
-              <NavLink to={item.to} end={item.end} className={({ isActive }) => (isActive ? activeNavLinkClasses : navLinkClasses)}>
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-
-        {/* --- DESKTOP RIGHT: CTA --- */}
-        <div className="hidden lg:flex items-center gap-5 shrink-0">
-          {user ? (
-            <>
-              <NavLink to="/dashboard" className="flex items-center gap-2 text-white text-xs font-bold uppercase tracking-widest hover:text-site-orange transition duration-300">
-                <FaUserCircle className="text-base" /> Portal
-              </NavLink>
-              <button
-                onClick={onLogout}
-                className="flex items-center gap-2 px-5 py-2.5 border border-red-500/40 text-red-300 font-bold text-xs uppercase tracking-widest rounded-sm hover:bg-red-500/10 transition-all duration-300"
-              >
-                Logout <FaSignOutAlt />
-              </button>
-            </>
-          ) : (
-            <MagneticButton
-              to="/login"
-              className="px-7 py-3 bg-site-orange text-white text-xs font-bold uppercase tracking-[0.15em] rounded-sm shadow-[0_0_0_0_rgba(213,119,47,0.6)] hover:shadow-[0_0_18px_2px_rgba(213,119,47,0.5)] inline-block"
-            >
-              Client Login
-            </MagneticButton>
-          )}
-        </div>
-      </div>
-
-      {/* --- MOBILE MENU --- */}
-      <div
-        className={`lg:hidden w-full bg-charcoal/95 backdrop-blur-xl border-t border-white/10 transition-all duration-300 ease-in-out origin-top overflow-hidden ${
-          isMobileMenuOpen ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <ul className="flex flex-col p-6 space-y-1">
-          {navItems.map((item) => (
-            <li key={item.to}>
-              <NavLink
-                to={item.to}
-                end={item.end}
-                onClick={closeMobileMenu}
-                className={({ isActive }) =>
-                  `block text-base font-bold uppercase tracking-wide py-3 border-b border-white/5 transition-colors ${
-                    isActive ? 'text-site-orange' : 'text-white/80 hover:text-white'
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            </li>
-          ))}
-
-          <div className="w-full h-px bg-white/10 my-3"></div>
-
-          {user ? (
-            <>
-              <li>
-                <NavLink to="/dashboard" onClick={closeMobileMenu} className="flex items-center gap-3 text-base font-bold text-site-orange uppercase tracking-wide py-2">
-                  <FaUserCircle /> Client Dashboard
+        {/* ---------- Mobile menu ---------- */}
+        <div className={`lg:hidden overflow-hidden transition-all duration-300 bg-white border-t border-nt-blue/10 ${mobileOpen ? 'max-h-[560px]' : 'max-h-0'}`}>
+          <ul className="px-6 py-3">
+            {navItems.map((item) => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  end={item.end}
+                  onClick={close}
+                  className={({ isActive }) => `block py-3 text-sm font-semibold border-b border-gray-100 ${isActive ? 'text-nt-red' : 'text-ink-900'}`}
+                >
+                  {item.label}
                 </NavLink>
               </li>
-              <li>
-                <button
-                  onClick={() => { onLogout(); closeMobileMenu(); }}
-                  className="w-full flex justify-center items-center gap-2 mt-3 px-6 py-3 border border-red-500/40 text-red-300 font-bold uppercase tracking-wider rounded-sm transition-all duration-300"
-                >
-                  Logout <FaSignOutAlt />
-                </button>
-              </li>
-            </>
-          ) : (
-            <li>
-              <Link
-                to="/login"
-                onClick={closeMobileMenu}
-                className="block w-full text-center mt-3 px-6 py-3.5 bg-site-orange text-white font-bold uppercase tracking-wider rounded-sm"
-              >
-                Client Login
-              </Link>
+            ))}
+            <li className="pt-4 pb-2">
+              {user ? (
+                <div className="flex gap-3">
+                  <Link to="/dashboard" onClick={close} className="flex-1 text-center py-3 bg-nt-blue text-white text-sm font-semibold rounded-sm">Dashboard</Link>
+                  <button onClick={() => { onLogout(); close(); }} className="flex-1 py-3 border border-nt-red text-nt-red text-sm font-semibold rounded-sm">Logout</button>
+                </div>
+              ) : (
+                <Link to="/login" onClick={close} className="block text-center py-3 bg-nt-red text-white text-sm font-semibold rounded-sm">Client Login</Link>
+              )}
             </li>
-          )}
-        </ul>
-      </div>
-    </nav>
+          </ul>
+        </div>
+      </nav>
+    </header>
   );
 };
 

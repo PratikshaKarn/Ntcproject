@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { loginUser } from '../services/api';
-import { FaArrowRight, FaLock } from 'react-icons/fa';
+import { FaLock, FaEnvelope, FaTasks, FaRupeeSign, FaFileAlt } from 'react-icons/fa';
 
+const PERKS = [
+  { icon: FaTasks, text: 'Track every phase of your project' },
+  { icon: FaRupeeSign, text: 'See payments and next instalments' },
+  { icon: FaFileAlt, text: 'View approvals and compliance documents' },
+];
+
+/** Client / admin login, styled after the NTC "Self Care" login. */
 const LoginPage = ({ onLogin }) => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,109 +27,75 @@ const LoginPage = ({ onLogin }) => {
       onLogin(response.data);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.msg || 'Login failed. Please verify your credentials.');
+      const data = err.response?.data;
+      setError(
+        data?.msg || data?.message ||
+        (err.response ? 'Login failed. Please verify your credentials.' : 'Cannot reach the server. Please try again shortly.')
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const inputCls =
+    'w-full pl-10 pr-4 py-3 rounded-sm border border-gray-300 bg-white text-ink-900 placeholder-gray-400 focus:border-nt-blue focus:ring-1 focus:ring-nt-blue outline-none';
+
   return (
-    <div className="min-h-screen relative flex items-center justify-center font-sans bg-charcoal overflow-hidden px-6">
-
-      {/* Abstract 3D geometric mesh wireframe backdrop */}
-      <svg
-        className="absolute inset-0 w-full h-full opacity-[0.18]"
-        viewBox="0 0 1200 800"
-        preserveAspectRatio="xMidYMid slice"
-      >
-        <defs>
-          <linearGradient id="meshFade" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0%" stopColor="#22d3ee" />
-            <stop offset="100%" stopColor="#d5772f" />
-          </linearGradient>
-        </defs>
-        <g fill="none" stroke="url(#meshFade)" strokeWidth="1">
-          {Array.from({ length: 9 }).map((_, i) => (
-            <line key={`h${i}`} x1="0" y1={i * 100} x2="1200" y2={i * 100 - 120} />
-          ))}
-          {Array.from({ length: 13 }).map((_, i) => (
-            <line key={`v${i}`} x1={i * 100} y1="0" x2={i * 100 + 120} y2="800" />
-          ))}
-        </g>
-      </svg>
-      <div className="absolute inset-0 bg-gradient-to-b from-charcoal via-charcoal/70 to-charcoal pointer-events-none" />
-
-      {/* Centered frosted glass card */}
-      <div className="relative z-10 w-full max-w-md bg-white/[0.06] backdrop-blur-xl border border-white/15 rounded-sm p-10 md:p-12 shadow-2xl">
-
-        <div className="flex flex-col items-center text-center mb-9">
-          <div className="w-14 h-14 rounded-full border border-site-orange/50 flex items-center justify-center text-site-orange text-xl mb-6">
-            <FaLock />
-          </div>
-          <span className="text-site-orange font-bold tracking-[0.25em] uppercase text-xs mb-2">
-            Client Secure Access
-          </span>
-          <h2 className="text-2xl font-extrabold text-white uppercase tracking-wide">
-            Account Login
-          </h2>
-          <p className="text-gray-400 text-sm mt-3">Please enter your authorized credentials.</p>
+    <div className="bg-nt-sky font-sans py-12 px-4">
+      <div className="max-w-4xl mx-auto grid md:grid-cols-2 bg-white shadow-card border-t-4 border-nt-red">
+        {/* Left: benefits */}
+        <div className="hidden md:flex flex-col justify-center bg-nt-blue text-white p-10">
+          <h2 className="text-2xl font-bold">Client Care</h2>
+          <p className="mt-2 text-sm text-white/80">Sign in to follow your construction project in one place.</p>
+          <ul className="mt-8 space-y-5">
+            {PERKS.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-4 text-sm">
+                <span className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center shrink-0"><Icon /></span>
+                {text}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/40 text-red-300 text-sm font-semibold text-center rounded-sm">
-            {error}
-          </div>
-        )}
+        {/* Right: form */}
+        <div className="p-8 md:p-10">
+          <h1 className="text-2xl font-bold text-nt-blue">Account login</h1>
+          <p className="text-sm text-ink-400 mt-1">Enter your registered email and password.</p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label htmlFor="email" className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-              Email Address
-            </label>
-            <input
-              type="email" id="email" name="email"
-              value={formData.email} onChange={handleChange}
-              className="w-full px-4 py-3.5 rounded-sm border border-white/15 bg-white/5 text-white placeholder-gray-500 focus:bg-white/10 focus:border-teal-accent focus:ring-1 focus:ring-teal-accent outline-none transition-all duration-300"
-              placeholder="client@example.com" required
-            />
-          </div>
+          {error && (
+            <div role="alert" className="mt-5 p-3 bg-red-50 border border-red-200 text-nt-red text-sm rounded-sm">{error}</div>
+          )}
 
-          <div>
-            <div className="flex justify-between items-end mb-2">
-              <label htmlFor="password" className="block text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-                Password
-              </label>
-              <Link to="/forgot-password" className="text-[11px] font-bold text-gray-500 hover:text-site-orange transition-colors uppercase tracking-widest">
-                Forgot Password?
-              </Link>
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-ink-700 mb-1.5">Email address</label>
+              <div className="relative">
+                <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} className={inputCls} placeholder="client@example.com" required autoComplete="email" />
+              </div>
             </div>
-            <input
-              type="password" id="password" name="password"
-              value={formData.password} onChange={handleChange}
-              className="w-full px-4 py-3.5 rounded-sm border border-white/15 bg-white/5 text-white placeholder-gray-500 focus:bg-white/10 focus:border-teal-accent focus:ring-1 focus:ring-teal-accent outline-none transition-all duration-300"
-              placeholder="••••••••" required
-            />
-          </div>
 
-          <button
-            type="submit" disabled={loading}
-            className="w-full flex items-center justify-center gap-3 bg-teal-accent hover:bg-teal-accent-dark text-white py-4 rounded-sm text-sm font-bold uppercase tracking-widest transition-all duration-300 disabled:bg-gray-600 group mt-2"
-          >
-            {loading ? 'Authenticating...' : 'Secure Login'}
-            {!loading && <FaArrowRight className="group-hover:translate-x-1 transition-transform duration-300" />}
-          </button>
-        </form>
+            <div>
+              <div className="flex justify-between items-center mb-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-ink-700">Password</label>
+                <Link to="/contact" className="text-xs text-nt-blue hover:underline">Forgot password?</Link>
+              </div>
+              <div className="relative">
+                <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" size={14} />
+                <input type="password" id="password" name="password" value={formData.password} onChange={handleChange} className={inputCls} placeholder="Enter your password" required autoComplete="current-password" />
+              </div>
+            </div>
 
-        <div className="mt-8 pt-6 border-t border-white/10 text-center">
-          <p className="text-gray-500 text-sm">
-            Don't have an account yet?{" "}
-            <Link to="/register" className="text-site-orange hover:text-cyan-glow font-bold uppercase tracking-wider transition-colors duration-200">
-              Register here
-            </Link>
+            <button type="submit" disabled={loading} className="w-full bg-nt-red hover:bg-red-700 disabled:bg-gray-400 text-white py-3 rounded-sm text-sm font-semibold transition-colors">
+              {loading ? 'Signing in...' : 'Login'}
+            </button>
+          </form>
+
+          <p className="mt-6 text-sm text-ink-700 text-center">
+            Don't have an account? <Link to="/register" className="text-nt-red font-semibold hover:underline">Register</Link>
           </p>
         </div>
       </div>
-
     </div>
   );
 };

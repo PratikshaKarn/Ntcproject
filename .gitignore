@@ -1,0 +1,6 @@
+server/.env
+server/vendor/
+server/database/database.sqlite
+server/backup.sql
+node_modules/
+.kilo/

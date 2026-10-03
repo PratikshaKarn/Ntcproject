@@ -59,7 +59,7 @@ export default function ChatWidget() {
       <button
         onClick={() => setOpen(true)}
         aria-label="Open AI Construction Assistant"
-        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-leaf-500 hover:bg-leaf-600 transition-colors text-white shadow-xl flex items-center justify-center"
+        className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-nt-red hover:bg-red-700 transition-colors text-white shadow-xl flex items-center justify-center"
       >
         <MessageCircle size={24} />
       </button>
@@ -119,7 +119,7 @@ export default function ChatWidget() {
               onClick={handleSend}
               disabled={sending || !input.trim()}
               aria-label="Send message"
-              className="h-9 w-9 shrink-0 rounded-full bg-leaf-500 hover:bg-leaf-600 disabled:opacity-50 transition-colors text-white flex items-center justify-center"
+              className="h-9 w-9 shrink-0 rounded-full bg-nt-red hover:bg-red-700 disabled:opacity-50 transition-colors text-white flex items-center justify-center"
             >
               <Send size={15} />
             </button>
