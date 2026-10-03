@@ -10,7 +10,7 @@ import { engineerFields, emptyEngineer } from './site-engineers.constants.js'
 
 export default function SiteEngineers() {
   const {
-    team, loaded, filtered, query, setQuery,
+    loaded, filtered, query, setQuery,
     adding, setAdding,
     viewingEngineer, setViewingEngineer, fullView, setFullView,
     editingEngineer, setEditingEngineer, deletingEngineer, setDeletingEngineer,

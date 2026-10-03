@@ -9,7 +9,7 @@ import { employeeFields, emptyEmployee } from './human-resource.constants.js'
 
 export default function HumanResourceManagement() {
   const {
-    users, filtered, query, setQuery,
+    filtered, query, setQuery,
     adding, setAdding,
     viewingEmployee, setViewingEmployee, fullView, setFullView,
     editingEmployee, setEditingEmployee, deletingEmployee, setDeletingEmployee,

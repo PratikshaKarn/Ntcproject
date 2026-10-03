@@ -1,7 +1,4 @@
-import { useEffect, useState } from 'react'
 import { Search, UserPlus, Filter } from 'lucide-react'
-import { getUsers } from '../../api/client.js'
-import { roleBadgeStyles } from '../../data/mockData.js'
 import ActionMenu from '../../components/shared/ActionMenu.jsx'
 import ConfirmDialog from '../../components/shared/ConfirmDialog.jsx'
 import DetailModal from '../../components/shared/DetailModal.jsx'

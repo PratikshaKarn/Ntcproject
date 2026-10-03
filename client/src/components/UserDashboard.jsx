@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import Topbar from './layout/Topbar.jsx';
+import Footer from './layout/FooterAdmin.jsx';
 import { 
   ClipboardList, FileText, Banknote, UserCircle, Menu, X,
   CheckCircle, Hourglass, Calendar, AlertCircle, LayoutDashboard, Clock
@@ -17,7 +19,7 @@ const EmptyPortfolioState = () => (
     </p>
     <Link 
       to="/contact" 
-      className="inline-block bg-blue-900 hover:bg-green-600 text-white font-bold py-3 px-8 rounded-full transition-all duration-300 shadow-lg hover:-translate-y-1"
+      className="inline-block bg-nt-blue hover:bg-nt-dark text-white font-bold py-3 px-8 rounded-sm transition-all duration-300 shadow-lg hover:-translate-y-1"
     >
       Contact to Buy Services
     </Link>
@@ -25,7 +27,7 @@ const EmptyPortfolioState = () => (
 );
 
 // --- Main Dashboard Component ---
-const UserDashboard = ({ user, onLogout }) => {
+const UserDashboard = ({ user }) => {
   // Default tab set to the new Project Overview
   const [activeTab, setActiveTab] = useState('overview');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -79,7 +81,7 @@ const UserDashboard = ({ user, onLogout }) => {
     }
   };
 
-  if (loading) return <div className="h-screen flex items-center justify-center text-xl font-bold text-blue-900">Loading your dashboard...</div>;
+  if (loading) return <div className="h-dvh flex items-center justify-center text-xl font-bold text-nt-blue">Loading your dashboard...</div>;
 
   const userData = {
     name: user?.name || "Guest User",
@@ -279,97 +281,89 @@ const UserDashboard = ({ user, onLogout }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 font-sans">
-      
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-20 lg:hidden" onClick={() => setIsSidebarOpen(false)} />
-      )}
+    <div className="h-dvh flex flex-col overflow-hidden bg-paper font-sans">
+      {/* Fixed header: never scrolls */}
+      <Topbar
+        onMenuClick={() => setIsSidebarOpen(true)}
+        label={userData.name}
+        showNotifications={false}
+        profileTo={null}
+      />
 
-      {/* --- SIDEBAR --- */}
-      <aside className={`fixed inset-y-0 left-0 w-72 bg-blue-900 text-white transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:relative lg:translate-x-0 transition-transform duration-300 ease-in-out z-30 shadow-2xl flex flex-col`}>
-        <div className="bg-[#d32f2f] p-8 pb-10 text-center rounded-br-[40px] shadow-lg relative">
-          <button className="absolute top-4 right-4 text-white lg:hidden" onClick={() => setIsSidebarOpen(false)}>
-            <X size={24} />
-          </button>
-          
-          {/* User Profile Picture Upload */}
-          <div className="relative w-28 h-28 mx-auto bg-white rounded-full flex items-center justify-center mb-5 overflow-hidden border-[6px] border-[#e57373] shadow-inner group">
-            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="userPicUpload" />
-            <label htmlFor="userPicUpload" className="cursor-pointer w-full h-full flex items-center justify-center relative">
-              {profilePic ? (
-                <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <UserCircle className="text-gray-300 w-full h-full" strokeWidth={1} />
-              )}
-              {/* Hover overlay for upload instructions */}
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <span className="text-white text-xs font-bold">Upload</span>
-              </div>
-            </label>
-          </div>
+      <div className="flex flex-1 min-h-0">
+        {/* Mobile overlay */}
+        {isSidebarOpen && (
+          <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setIsSidebarOpen(false)} />
+        )}
 
-          <h2 className="text-2xl font-extrabold tracking-widest uppercase text-white drop-shadow-sm">
-            {userData.name}
-          </h2>
-          <p className="text-base font-bold mt-2 text-white drop-shadow-sm">
-            Client Code: {userData.clientCode}
-          </p>
-        </div>
-
-        {/* Dashboard Navigation Menu */}
-        <nav className="flex-1 p-4 mt-6 space-y-3 overflow-y-auto">
-          <p className="px-4 text-xs font-bold text-blue-300 uppercase tracking-widest mb-4">Dashboard Menu</p>
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                setIsSidebarOpen(false);
-              }}
-              disabled={!userData.hasPurchasedServices}
-              className={`w-full flex items-center gap-4 px-4 py-3.5 rounded-xl font-bold transition-all duration-200 ${
-                activeTab === item.id && userData.hasPurchasedServices
-                  ? 'bg-blue-800 border-l-4 border-green-400 text-white shadow-md' 
-                  : 'text-blue-200 hover:bg-blue-800 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed'
-              }`}
-            >
-              <span className="text-xl">{item.icon}</span>
-              <span>{item.label}</span>
+        {/* Sidebar */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-50 w-72 shrink-0 flex flex-col overflow-y-auto scroll-area bg-brand-400 text-white shadow-2xl transition-transform duration-300 ease-in-out md:static md:z-auto md:translate-x-0 md:shadow-none ${
+            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          <div className="bg-nt-red p-6 text-center relative">
+            <button className="absolute top-3 right-3 text-white md:hidden" onClick={() => setIsSidebarOpen(false)} aria-label="Close menu">
+              <X size={22} />
             </button>
-          ))}
-        </nav>
-      </aside>
 
-      {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 flex flex-col h-screen overflow-hidden">
-        
-        {/* Mobile Header */}
-        <header className="bg-white shadow-sm p-4 flex items-center gap-4 lg:hidden z-10">
-          <button onClick={() => setIsSidebarOpen(true)} className="text-blue-900 focus:outline-none">
-            <Menu size={24} />
-          </button>
-          <h1 className="text-xl font-black text-blue-900 tracking-wide">Client Portal</h1>
-        </header>
+            <div className="relative w-24 h-24 mx-auto bg-white rounded-full mb-4 overflow-hidden border-4 border-white/60 group">
+              <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" id="userPicUpload" />
+              <label htmlFor="userPicUpload" className="cursor-pointer w-full h-full flex items-center justify-center relative">
+                {profilePic ? (
+                  <img src={profilePic} alt="Profile" className="w-full h-full object-cover" />
+                ) : (
+                  <UserCircle className="text-gray-300 w-full h-full" strokeWidth={1} />
+                )}
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="text-white text-xs font-bold">Upload</span>
+                </div>
+              </label>
+            </div>
 
-        <div className="flex-1 overflow-y-auto p-4 lg:p-10 bg-gray-50">
-          <div className="max-w-5xl mx-auto flex flex-col items-center justify-start min-h-full">
-            
-            {/* CONDITIONAL RENDERING FOR TABS */}
-            {!userData.hasPurchasedServices ? (
-              <EmptyPortfolioState />
-            ) : (
-              <div className="w-full">
-                {activeTab === 'overview' && renderOverviewTab()}
-                {activeTab === 'assignment' && renderAssignmentTab()}
-                {activeTab === 'compliance' && renderComplianceTab()}
-                {activeTab === 'payment' && renderPaymentTab()}
-              </div>
-            )}
-
+            <h2 className="text-lg font-bold text-white truncate">{userData.name}</h2>
+            <p className="text-sm mt-1 text-white/90">Client Code: {userData.clientCode}</p>
           </div>
+
+          <nav className="flex-1 p-4 space-y-1">
+            <p className="px-3 text-xs font-semibold text-white/50 mb-3">Dashboard menu</p>
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => { setActiveTab(item.id); setIsSidebarOpen(false); }}
+                disabled={!userData.hasPurchasedServices}
+                className={`w-full flex items-center gap-3 px-3 py-3 rounded-md text-sm font-medium transition-colors ${
+                  activeTab === item.id && userData.hasPurchasedServices
+                    ? 'bg-white/15 text-white border-l-4 border-nt-red'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed'
+                }`}
+              >
+                <span className="[&>svg]:w-5 [&>svg]:h-5">{item.icon}</span>
+                <span className="text-left">{item.label}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Content column: only <main> scrolls, footer stays pinned */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          <main className="flex-1 min-h-0 overflow-y-auto scroll-area p-4 md:p-8">
+            <div className="max-w-5xl mx-auto">
+              {!userData.hasPurchasedServices ? (
+                <EmptyPortfolioState />
+              ) : (
+                <div className="w-full">
+                  {activeTab === 'overview' && renderOverviewTab()}
+                  {activeTab === 'assignment' && renderAssignmentTab()}
+                  {activeTab === 'compliance' && renderComplianceTab()}
+                  {activeTab === 'payment' && renderPaymentTab()}
+                </div>
+              )}
+            </div>
+          </main>
+          <Footer />
         </div>
-      </main>
+      </div>
     </div>
   );
 };

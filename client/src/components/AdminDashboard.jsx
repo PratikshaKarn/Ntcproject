@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Users, Settings, LogOut, Check, Trash2, Plus, FileText, 
   IndianRupee, Briefcase, Bell, AlertCircle, Download, Clock, Search, UserCircle 
@@ -28,7 +28,7 @@ const AdminDashboard = ({ user, onLogout }) => {
 
   const API_URL = `${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/auth`;
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     try {
       const response = await fetch(`${API_URL}/users`);
       if (response.ok) {
@@ -40,9 +40,9 @@ const AdminDashboard = ({ user, onLogout }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_URL]);
 
-  useEffect(() => { fetchUsers(); }, []);
+  useEffect(() => { fetchUsers(); }, [fetchUsers]);
 
   // --- RESTORED: Profile Picture Upload Handler ---
   const handleImageUpload = (e) => {

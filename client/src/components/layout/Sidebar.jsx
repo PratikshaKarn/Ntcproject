@@ -23,7 +23,7 @@ const NAV = [
     end: true,
   },
   {
-    to: '/admin/projects',
+    to: '/admin/human-resource',
     label: 'Human Resource Management',
     icon: HardHat,
   },
@@ -200,8 +200,7 @@ export default function Sidebar({
           shrink-0
           border-r border-white/10
           bg-brand-400
-          sticky top-16
-          h-[calc(100vh-4rem)]
+          h-full
           overflow-hidden
           transition-all duration-300 ease-in-out
           ${expanded ? 'w-64' : 'w-16'}

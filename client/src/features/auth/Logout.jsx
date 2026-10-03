@@ -13,18 +13,19 @@ import { clearAuth } from "../../auth.js";
  *     mostly just needs to trigger that endpoint — there won't be a
  *     token in localStorage to clear.
  */
-export default function Logout() {
+export default function Logout({ onLogout }) {
   const navigate = useNavigate();
 
   useEffect(() => {
     clearAuth();
+    onLogout?.();
 
     const timer = setTimeout(() => {
       navigate("/login", { replace: true });
     }, 900);
 
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [navigate, onLogout]);
 
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-white px-6">

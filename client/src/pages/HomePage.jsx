@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import NtcQuickPanel from '../components/NtcQuickPanel.jsx';
 import { Link } from 'react-router-dom';
 import ProjectCard from '../components/ProjectCard.jsx';
 import { getProjects } from '../services/api.js';
@@ -169,7 +170,7 @@ const HomePage = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-charcoal via-charcoal/90 to-charcoal/40" />
         </div>
 
-        <div className="relative z-10 container mx-auto px-6 max-w-7xl pt-32 pb-20 md:pt-40 md:pb-28">
+        <div className="relative z-10 container mx-auto px-6 max-w-7xl pt-16 pb-20 md:pt-24 md:pb-28">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
             {/* Left: Headline */}
@@ -201,6 +202,8 @@ const HomePage = () => {
           </div>
         </div>
       </section>
+
+      <NtcQuickPanel />
 
       {/* ================= CAPABILITIES / SERVICES ================= */}
       <section className="bg-charcoal-light text-white py-20 md:py-28">

@@ -92,20 +92,19 @@ const ContactPage = () => {
         <div className="container mx-auto px-6 max-w-6xl py-16">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-x-10">
             <InfoRow icon={<FaMapMarkerAlt />} title="Corporate Office">
-              <p>R-12, New Colony, Raja Nagar,</p>
-              <p>Talkhapur, Sitamarhi, Bihar, 843301</p>
+              <p>NTC Building, Jawalakhel, Lalitpur, Bagmati Province, PIN code 44700</p>
             </InfoRow>
             <InfoRow icon={<FaEnvelope />} title="Email Address">
-              <p><a href="mailto:anbuildworks@gmail.com" className="hover:text-site-orange transition-colors">anbuildworks@gmail.com</a></p>
+              <p><a href="mailto:const@gmail.com" className="hover:text-site-orange transition-colors">const@gmail.com</a></p>
               <p><a href="mailto:projects@constructionwork.com" className="hover:text-site-orange transition-colors">projects@constructionwork.com</a></p>
             </InfoRow>
             <InfoRow icon={<FaPhoneAlt />} title="Phone Lines">
-              <p>+91-9142873421 <span className="text-gray-500">(Office)</span></p>
-              <p>+91-9876543211 <span className="text-gray-500">(Projects)</span></p>
+              <p> <span className="text-gray-500">(Office)</span></p>
+              <p>+977-9800000000 <span className="text-gray-500">(Projects)</span></p>
             </InfoRow>
             <InfoRow icon={<FaClock />} title="Working Hours">
-              <p>Mon &ndash; Sat: 9:00 AM &ndash; 6:00 PM</p>
-              <p>Sunday: Closed</p>
+              <p>Mon &ndash; Fri: 9:00 AM &ndash; 6:00 PM</p>
+              <p>Saturday-Sunday: Closed</p>
             </InfoRow>
           </div>
         </div>
